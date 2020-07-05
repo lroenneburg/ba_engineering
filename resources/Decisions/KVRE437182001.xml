@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dokument
+  SYSTEM "http://www.rechtsprechung-im-internet.de/dtd/v1/rii-dok.dtd">
+<dokument>
+   <doknr>KVRE437182001</doknr>
+   <ecli>ECLI:DE:BVerfG:2020:rk20200617a.1bvr138020</ecli>
+   <gertyp>BVerfG</gertyp>
+   <gerort/>
+   <spruchkoerper>1. Senat 2. Kammer</spruchkoerper>
+   <entsch-datum>20200617</entsch-datum>
+   <aktenzeichen>1 BvR 1380/20</aktenzeichen>
+   <doktyp>Kammerbeschluss</doktyp>
+   <norm/>
+   <vorinstanz>vorgehend LG Berlin, 12. Mai 2020, Az: 27 O 196/20, Beschluss<br/>nachgehend BVerfG, 17. Juni 2020, Az: 1 BvR 1380/20, Einstweilige Anordnung</vorinstanz>
+   <region>
+      <abk>DEU</abk>
+      <long>Bundesrepublik Deutschland</long>
+   </region>
+   <mitwirkung/>
+   <titelzeile>
+      <dl class="RspDL">
+         <dt/>
+         <dd>
+            <p>Kammerbeschluss: Teilweise Parallelentscheidung</p>
+         </dd>
+      </dl>
+   </titelzeile>
+   <leitsatz/>
+   <sonstosatz/>
+   <tenor>
+      <div>
+         <dl class="RspDL">
+            <dt/>
+            <dd>
+               <p>Die Ablehnung wegen Besorgnis der Befangenheit seitens des Äußerungsberechtigten wird als unstatthaft verworfen.</p>
+            </dd>
+         </dl>
+      </div>
+   </tenor>
+   <tatbestand/>
+   <entscheidungsgruende/>
+   <gruende>
+      <div>
+         <dl class="RspDL">
+            <dt>
+               <a name="rd_1">1</a>
+            </dt>
+            <dd>
+               <p>Eine Ablehnung wegen Besorgnis der Befangenheit ist nur durch Verfahrensbeteiligte statthaft (Kliegel, in: Barczak, BVerfGG, § 19 Rn. 6). Anhörungsberechtigte nach § 94 Abs. 3 BVerfGG können dem Verfahren nicht förmlich beitreten (vgl. § 94 Abs. 5 BVerfGG) und sind daher nicht Beteiligte in diesem Sinn (vgl. Nettersheim, in: Barczak, BVerfGG, § 94 Rn. 28). Anhörungsberechtigte nach § 94 Abs. 3 BVerfGG, die mangels Beitrittsmöglichkeit gemäß § 94 Abs. 5 BVerfGG nicht Verfahrensbeteiligte sind oder werden können, können Verfahrensanträge nicht stellen.</p>
+            </dd>
+         </dl>
+         <dl class="RspDL">
+            <dt>
+               <a name="rd_2">2</a>
+            </dt>
+            <dd>
+               <p>Die Kammer sieht auch keine von Amts wegen nach § 19 Abs. 3 BVerfGG zu berücksichtigenden Umstände, die eine Besorgnis der Befangenheit begründen könnten.</p>
+            </dd>
+         </dl>
+         <dl class="RspDL">
+            <dt>
+               <a name="rd_3">3</a>
+            </dt>
+            <dd>
+               <p>Diese Entscheidung ist unanfechtbar.</p>
+            </dd>
+         </dl>
+      </div>
+   </gruende>
+   <abwmeinung/>
+   <sonstlt/>
+   <identifier>http://www.rechtsprechung-im-internet.de/jportal/?quelle=jlink&amp;docid=KVRE437182001&amp;psml=bsjrsprod.psml&amp;max=true</identifier>
+   <coverage>Deutschland</coverage>
+   <language>deutsch</language>
+   <publisher>BMJV</publisher>
+   <accessRights>public</accessRights>
+</dokument>
