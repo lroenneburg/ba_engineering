@@ -23,8 +23,12 @@ public class Decision {
     private String _fact;
     private ArrayList<DecisionSection> _decisionReasons;
     private String _dissentingOpinion;
-    private String _url;
-    private ArrayList<String> _occuringDecisions;
+    private String _url;private ArrayList<String> _occuringDecisions;
+
+    private ArrayList<String> _occuringPersons;
+    private ArrayList<String> _occuringLocations;
+    private ArrayList<String> _occuringOrganisations;
+
 
     /**
      * Creates a decision Object with all relevant Information of the decision
@@ -47,7 +51,12 @@ public class Decision {
      * @param url
      * @param occuringDecisions
      */
-    public Decision(String decisionID, String ecli, String courtType, String formation, String decisionDate, String docketNumber, String decisionType, ArrayList<String> norms, ArrayList<String> lowerCourts, String decisionTitle, String guidingPrinciple, String sonstosatz, ArrayList<String> tenor, String fact, ArrayList<DecisionSection> decisionReasons, String dissentingOpinion, String url, ArrayList<String> occuringDecisions) {
+    public Decision(String decisionID, String ecli, String courtType, String formation, String decisionDate,
+                    String docketNumber, String decisionType, ArrayList<String> norms, ArrayList<String> lowerCourts,
+                    String decisionTitle, String guidingPrinciple, String sonstosatz, ArrayList<String> tenor,
+                    String fact, ArrayList<DecisionSection> decisionReasons, String dissentingOpinion, String url,
+                    ArrayList<String> occuringDecisions, ArrayList<String> occuringPersons,
+                    ArrayList<String> occuringLocations, ArrayList<String> occuringOrganisations) {
         this._decisionID = decisionID;
         this._ecli = ecli;
         this._courtType = courtType;
@@ -66,6 +75,9 @@ public class Decision {
         this._dissentingOpinion = dissentingOpinion;
         this._url = url;
         this._occuringDecisions = occuringDecisions;
+        this._occuringPersons = occuringPersons;
+        this._occuringLocations = occuringLocations;
+        this._occuringOrganisations = occuringOrganisations;
     }
 
 
@@ -77,5 +89,15 @@ public class Decision {
         return _occuringDecisions;
     }
 
+    public ArrayList<String> getOccuringPersons() {
+        return _occuringPersons;
+    }
 
+    public ArrayList<String> getOccuringLocations() {
+        return _occuringLocations;
+    }
+
+    public ArrayList<String> getOccuringOrganisations() {
+        return _occuringOrganisations;
+    }
 }

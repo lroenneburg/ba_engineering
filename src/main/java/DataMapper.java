@@ -24,21 +24,34 @@ public class DataMapper {
             "((GSZ|LwZB|WpSt\\s?\\(B\\)|AnwZ|LwZR|KVZ|EnRB|PatAnwSt\\s?\\(B\\)|ARP|VGS|WpSt\\s?\\(R\\)|RiSt\\s?\\(B\\)|EnZA|KRB|AnwSt\\s?\\(R\\)|NotSt\\s?\\(Brfg\\)|EnVR|LwZA|ZB|AR\\s?\\(Vollz\\)|StB|ZR|AR\\s?\\(VS\\)|BJs|BLw|NotZ\\s?\\(Brfg\\)|RiZ\\s?\\(B\\)|PatAnwSt\\s?\\(R\\)|AK|RiZ|PatAnwZ|ARs|StbSt\\s?\\(R\\)|VRG|NotSt\\s?\\(B\\)|AR\\s?\\(Enw\\)|AR\\s?\\(VZ\\)|StE|KVR|AR\\s?\\(Ri\\)|AR|AnwSt|NotZ|StbSt\\s?\\(B\\)|StR|ZA|AnwZ\\s?\\(B\\)|EnZR|AR\\s?\\(Kart\\)|GSSt|AnwZ\\s?\\(P\\)|ZR\\s?\\(Ü\\)|AnwZ\\s?\\(Brfg\\)|KZB|BGns|KZR|RiSt|KZA|BAusl|AnwSt\\s?\\(B\\)|BGs|RiZ\\s?\\(R\\)|EnZB|RiSt\\s?\\(R\\)|ARZ|EnVZ)\\s\\d+/\\d+)|" +
             "([I+|IV|V|VI|VII|VIII|IX|X|XI|XII|1-6]+[a-z]?\\s[A-Za-z\\(\\)]{2,20}\\s\\d+/\\d\\d)";
 
-    public DataMapper() throws IOException, SAXException, ParserConfigurationException, URISyntaxException {
+    public DataMapper() throws IOException, SAXException, ParserConfigurationException, URISyntaxException, InterruptedException {
 
         ArrayList<Decision> allDecisionsInDB = new ArrayList<>();
 
         File folder = new File("resources/Decisions");
+        //TODO uncomment
         for (File dec_file : folder.listFiles()) {
             Decision dec_object = readDecisionXML(dec_file.getCanonicalPath());
-            //readDecisionXML("resources/Decisions/KVRE437202001.xml");
+            ////readDecisionXML("resources/Decisions/KVRE437202001.xml");
             allDecisionsInDB.add(dec_object);
         }
+
+        //TODO uncomment for person network
+        //Decision dc = readDecisionXML("resources/Decisions/KVRE436562001.xml");
+        //Decision dc2 = readDecisionXML("resources/Decisions/KVRE437412001.xml");
+        //Decision dc3 = readDecisionXML("resources/Decisions/KVRE437342001.xml");
+        //Decision dc4 = readDecisionXML("resources/Decisions/KVRE436642001.xml");
+        //allDecisionsInDB.add(dc);
+        //allDecisionsInDB.add(dc2);
+        //allDecisionsInDB.add(dc3);
+        //allDecisionsInDB.add(dc4);
+
+
         System.out.println("finished mapping");
         Network network = new Network(allDecisionsInDB);
     }
 
-    private Decision readDecisionXML(String fileName) throws IOException, SAXException, ParserConfigurationException {
+    private Decision readDecisionXML(String fileName) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 
 
         File file = new File(fileName);
@@ -70,7 +83,9 @@ public class DataMapper {
         for (Element e : doc.select("vorinstanz")) {
             String[] lc_parts = e.html().replace("\n", "").split("<br />");
             for (String part : lc_parts) {
-                lowerCourts.add(part);
+                if (!part.equals("")) {
+                    lowerCourts.add(part);
+                }
             }
         }
 
@@ -134,12 +149,24 @@ public class DataMapper {
             occuringDecisions.addAll(findAllRegExMatches(ds.getText()));
         }
 
+        //TODO uncomment for person network
+        ArrayList<String> occuringPersons = new ArrayList<>();
+        ArrayList<String> occuringLocations = new ArrayList<>();
+        ArrayList<String> occuringOrganisations = new ArrayList<>();
+        //PDFController pdfController = new PDFController(ecli, year, month);
+        //ArrayList<String> occuringPersons = pdfController.getOccuringPersons();
+        //ArrayList<String> occuringLocations = pdfController.getOccuringLocations();
+        //ArrayList<String> occuringOrganisations = pdfController.getOccuringOrganisations();
+
+
 
         String dissentingOpinion = doc.select("abwmeinung").html().trim();
         String raw_decisionUrl_string = doc.select("identifier").text().trim();
         String decisionURL = raw_decisionUrl_string.substring(0, raw_decisionUrl_string.lastIndexOf('&')) + "&doc.part=L" + raw_decisionUrl_string.substring(raw_decisionUrl_string.lastIndexOf('&'));
 
-        Decision dec = new Decision(decisionID, ecli, courtType, formation, decisionDate, docketNumber, decisionType, norms, lowerCourts, decisionTitle, guidingPrinciple, sonstosatz, tenor, fact, reasonsOrDecReasons, dissentingOpinion, decisionURL, occuringDecisions);
+        Decision dec = new Decision(decisionID, ecli, courtType, formation, decisionDate, docketNumber, decisionType,
+                norms, lowerCourts, decisionTitle, guidingPrinciple, sonstosatz, tenor, fact, reasonsOrDecReasons,
+                dissentingOpinion, decisionURL, occuringDecisions, occuringPersons, occuringLocations, occuringOrganisations);
         return dec;
 
     }

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -25,13 +26,30 @@ public class DataDownloader {
     private String _bsgURL = "https://www.rechtsprechung-im-internet.de/jportal/docs/feed/bsjrs-bsg.xml";
     private String _bpatgURL = "https://www.rechtsprechung-im-internet.de/jportal/docs/feed/bsjrs-bpatg.xml";
 
+    private ArrayList<String> _testDataSet = new ArrayList<>();
 
-    public DataDownloader() throws IOException, ParserConfigurationException, SAXException, URISyntaxException {
-        ArrayList <String> bverfg_decision_ids = readRSSFeed(_bverfgURL);
-        for (String entry : bverfg_decision_ids) {
+
+    public DataDownloader() throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InterruptedException {
+        String[] things_1 = {"KVRE421301701", "KVRE421311701", "KVRE421321701", "KVRE421341701", "KVRE421441701", "KVRE421451701", "KVRE421681701", "KVRE421281701", "KVRE421421701", "KVRE421571701"};
+        String[] things_2 = {"KVRE421291701", "KVRE420361701", "KVRE420401701", "KVRE421081701", "KVRE420371701", "KVRE420411701", "KVRE420551701", "KVRE420681701", "KVRE420741701", "KVRE420301701"};
+        String[] things_3 = {"KVRE419681701", "KVRE419331701", "KVRE419411701", "KVRE419311701", "KVRE419341701", "KVRE419291701", "KVRE419421701", "KVRE419431701", "KVRE419611701", "KVRE419801701"};
+        String[] things_4 = {"KVRE416431601", "KVRE415551601", "KVRE415631601", "KVRE416161601", "KVRE416201601", "KVRE416211601", "KVRE416231601", "KVRE416251601", "KVRE416261601", "KVRE416281601"};
+        String[] things_5 = {"KVRE412001501", "KVRE411571501", "KVRE411581501", "KVRE411591501", "KVRE411601501", "KVRE411711501", "KVRE411561501", "KVRE411671501", "KVRE411501501", "KVRE411531501"};
+        _testDataSet.addAll(Arrays.asList(things_1));
+        _testDataSet.addAll(Arrays.asList(things_2));
+        _testDataSet.addAll(Arrays.asList(things_3));
+        _testDataSet.addAll(Arrays.asList(things_4));
+        _testDataSet.addAll(Arrays.asList(things_5));
+
+        //ArrayList <String> bverfg_decision_ids = readRSSFeed(_bverfgURL);
+        //for (String entry : bverfg_decision_ids) {
+        //    downloadDecisionXML(entry, "BVerfG");
+        //}
+        for (String entry : _testDataSet) {
             downloadDecisionXML(entry, "BVerfG");
         }
-        //DataMapper dm = new DataMapper();
+
+        DataMapper dm = new DataMapper();
         //downloadDecisionXML(bverfg_decision_ids.get(4), "BVerfG");
 
 
