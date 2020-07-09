@@ -13,6 +13,7 @@ public class Main {
         // WebScraper ws = new WebScraper();
         DataMapper dm = new DataMapper();
         //PDFController pdfController = new PDFController("ECLI:DE:BVerfG:2020:qk20200627.1bvq007420", "2020", "06");
+        //Validator validator = new Validator();
     }
 
 }

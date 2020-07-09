@@ -39,8 +39,8 @@ public class PDFController {
 
         URL url = new URL(pdfUrl);
         try (InputStream in = url.openStream()) {
-            //Files.copy(in, Paths.get("resources/DecisionPDFs/" + str + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(in, Paths.get("resources/DecisionPDFs/" + "temp_document" + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(in, Paths.get("resources/DecisionPDFs/" + str + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
+            //Files.copy(in, Paths.get("resources/DecisionPDFs/" + "temp_document" + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             System.out.println("Decision not found in BVerfG PDF Database:" + ecli);
         }
