@@ -23,7 +23,8 @@ public class Decision {
     private String _fact;
     private ArrayList<DecisionSection> _decisionReasons;
     private String _dissentingOpinion;
-    private String _url;private ArrayList<String> _occuringDecisions;
+    private String _url;
+    private ArrayList<String> _occuringDecisions;
 
     private ArrayList<String> _occuringPersons;
     private ArrayList<String> _occuringLocations;
@@ -80,6 +81,10 @@ public class Decision {
         this._occuringOrganisations = occuringOrganisations;
     }
 
+
+    public String getEcli() {
+        return _ecli;
+    }
 
     public String getDocketNumber() {
         return _docketNumber;

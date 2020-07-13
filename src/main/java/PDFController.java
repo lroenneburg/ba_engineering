@@ -20,9 +20,9 @@ public class PDFController {
     private HashMap<String, ArrayList<String>> _extractedEntities;
 
     public PDFController(String ecli, String year, String month) throws IOException, InterruptedException {
-        downloadPDF("BVerfG", ecli, year, month);
-        //ArrayList<String> sentences = convertToText();
-        //_extractedEntities = extractEntities(sentences);
+        //downloadPDF("BVerfG", ecli, year, month);
+        ArrayList<String> sentences = convertToText();
+        //_extractedEntities = extractEntities(sentences, ecli);
 
 
     }
@@ -39,8 +39,8 @@ public class PDFController {
 
         URL url = new URL(pdfUrl);
         try (InputStream in = url.openStream()) {
-            Files.copy(in, Paths.get("resources/DecisionPDFs/" + str + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
-            //Files.copy(in, Paths.get("resources/DecisionPDFs/" + "temp_document" + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
+            //Files.copy(in, Paths.get("resources/DecisionPDFs/" + str + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(in, Paths.get("resources/DecisionPDFs/" + "temp_document" + ".pdf"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             System.out.println("Decision not found in BVerfG PDF Database:" + ecli);
         }
@@ -80,8 +80,9 @@ public class PDFController {
 
     /**
      * @param sentences
+     * @param ecli
      */
-    private HashMap<String, ArrayList<String>> extractEntities(ArrayList<String> sentences) throws IOException, InterruptedException {
+    private HashMap<String, ArrayList<String>> extractEntities(ArrayList<String> sentences, String ecli) throws IOException, InterruptedException {
         ArrayList<String> listOfWords = new ArrayList<>();
         //Pattern pattern  = Pattern.compile("[^A-Za-z0-9äÄöÖüÜß\\s][a-zA-Z0-9äÄöÖüÜß]|[a-zA-Z0-9äÄöÖüÜß][^A-Za-z0-9äÄöÖüÜß\\s]");
         //Pattern pattern = Pattern.compile("[^A-Za-z0-9äÄöÖüÜß\\s]");
@@ -107,8 +108,7 @@ public class PDFController {
         writer.close();
 
 
-
-        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "resources/EntityRecognition/GermaNER-nofb-09-09-2015.jar", "-mx1g", "-t", "resources/EntityRecognition/text.tsv", "-o", "resources/EntityRecognition/output_text.tsv");
+        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "resources/EntityRecognition/GermaNER-nofb-09-09-2015.jar", "-mx1400m", "-t", "resources/EntityRecognition/text.tsv", "-o", "resources/EntityRecognition/output_text.tsv");
         Process p = pb.start();
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String s = "";
@@ -214,6 +214,14 @@ public class PDFController {
         entities.put("Persons", persons);
         entities.put("Organisations", organisations);
         entities.put("Locations", locations);
+
+        ecli = ecli.split(":")[4];
+        ecli = ecli.replace(".", "_");
+        FileWriter wr = new FileWriter("resources/EntityRecognition/" + ecli + ".txt");
+        for(String str : persons) {
+            wr.write(str + System.lineSeparator());
+        }
+        wr.close();
 
         // Delete the files
         File fo = new File("resources/EntityRecognition/output_text.tsv");

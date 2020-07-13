@@ -20,15 +20,17 @@ import java.util.Set;
 public class Network {
 
     public Network(ArrayList<Decision> decisions) throws URISyntaxException {
-        createDocketNumberNetwork(decisions);
-        //TODO uncomment for person network
-        //createEntityNetwork(decisions);
+        Graph<String, DefaultEdge> docketNumberNetwork = createDocketNumberNetwork(decisions);
+        Validator validator = new Validator(docketNumberNetwork, decisions);
+
+        Graph<String, DefaultEdge> entityNetwork = createEntityNetwork(decisions);
+        Validator entity_validator = new Validator(entityNetwork, decisions, "entity");
     }
 
     /**
      *
      */
-    private void createEntityNetwork(ArrayList<Decision> decisions) {
+    private Graph<String, DefaultEdge> createEntityNetwork(ArrayList<Decision> decisions) {
         Graph<String, DefaultEdge> entity_graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
         for (Decision dec : decisions) {
@@ -56,6 +58,7 @@ public class Network {
             v = v.replace('/', '_');
             v = v.replace(" ", "_");
             v = v.replace(",", "_");
+            v = v.replace("-", "_");
             v = v.replace("ä", "ae");
             v = v.replace("Ä", "Ae");
             v = v.replace("ö", "oe");
@@ -74,14 +77,15 @@ public class Network {
         Writer writer = new StringWriter();
         exporter.exportGraph(entity_graph, writer);
         System.out.println(writer.toString());
-        System.out.println("fin_entities");
+
+        return entity_graph;
     }
 
 
     /**
      *
      */
-    private void createDocketNumberNetwork(ArrayList<Decision> decs) {
+    private Graph<String, DefaultEdge> createDocketNumberNetwork(ArrayList<Decision> decs) {
 
         Graph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
@@ -125,8 +129,6 @@ public class Network {
         exporter.exportGraph(graph, writer);
         System.out.println(writer.toString());
 
-        Validator validator = new Validator(graph, decs);
-
-        System.out.println("test_fin");
+        return graph;
     }
 }

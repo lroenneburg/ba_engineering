@@ -1,5 +1,6 @@
 import com.opencsv.CSVReader;
 import model.Decision;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -14,10 +15,11 @@ public class Validator {
 
     private String _edgesDocumentPath = "resources/Coupette/bverfge-edges.csv";
     private String _nodeDocumentPath = "resources/Coupette/bverfge-nodes.csv";
+    private String _ground_truth_judgesPath = "resources/EntityRecognition/ground_truth_judges.csv";
 
     /**
-     *
-     *
+     * This constructor is used for the case, that we want to evaluate the DocketNumberNetwork against the results of
+     * Corinna Coupettes approach
      */
     public Validator(Graph<String, DefaultEdge> graph, ArrayList<Decision> decisions) {
         HashMap<String, String> dictionary = getDictData(_nodeDocumentPath);
@@ -27,23 +29,22 @@ public class Validator {
         //    backwards_dictionary.put(entry.getValue(), entry.getKey());
         //}
 
-        int test = graph.edgeSet().size();
-        ArrayList<String> DecisionsFromTestSet = new ArrayList<>();
+        ArrayList<String> fsForDecisionsFromTestSet = new ArrayList<>();
         for (Decision d : decisions) {
             String dn = d.getDocketNumber();
             if (dn.contains(",")) {
                 String[] parts = dn.split(",");
                     String p = parts[0].trim();
                     p = dictionary.get(p);
-                    DecisionsFromTestSet.add(p);
+                    fsForDecisionsFromTestSet.add(p);
 
             }
             else {
-                DecisionsFromTestSet.add(dictionary.get(dn));
+                fsForDecisionsFromTestSet.add(dictionary.get(dn));
             }
 
         }
-        ArrayList<String[]> references = getReferenceData(_edgesDocumentPath, DecisionsFromTestSet);
+        ArrayList<String[]> references = getReferenceData(_edgesDocumentPath, fsForDecisionsFromTestSet);
 
 
         ArrayList<String[]> my_references = new ArrayList<>();
@@ -78,41 +79,21 @@ public class Validator {
             String[] ps = string.split("__");
             references.add(new String[]{ps[0].trim(), ps[1].trim()});
         }
-        /*
-        Set<DefaultEdge> defaultEdges = graph.edgeSet();
-        for (DefaultEdge de : defaultEdges) {
-            String source = graph.getEdgeSource(de);
-            String target = graph.getEdgeTarget(de);
-            if (source.contains(",") && !source.contains("BVerfGE")) {
-                source = source.split(",")[0].trim();
-            }
-            if (target.contains(",") && !target.contains("BVerfGE")) {
-                target = target.split(",")[0].trim();
-            }
-            if (!source.contains("BVerfGE")) {
-                source = dictionary.get(source);
-            }
-            if (!target.contains("BVerfGE")) {
-                target = dictionary.get(target);
-            }
-            //String source_fs = dictionary.get(source);
-            //String target_fs = dictionary.get(target);
-            if (source != null && target != null) {
-                my_references.add(new String[]{source, target});
-            }
-            else {
-                System.out.println("Problem with: " + source + " or" + target);
-            }
-
-        }
-        */
 
         compareResults(references, my_references);
 
-        //compareAndEvaluate(dictionary, references, graph);
-
         System.out.println("test");
     }
+
+    /**
+     * This contructor is used for the case, that we want to evaluate the NER of the judges against the ground truth
+     * of a law domain expert
+     */
+    public Validator(Graph<String, DefaultEdge> graph, ArrayList<Decision> decisions, String entity) {
+        HashMap<String, ArrayList<String>> groundTruth = getGroundTruthData(_ground_truth_judgesPath);
+        compareEntities(groundTruth, decisions);
+    }
+
 
     private void compareResults(ArrayList<String[]> references, ArrayList<String[]> my_references) {
 
@@ -137,12 +118,12 @@ public class Validator {
             }
         }
         double accuracy = (double) match_counter / (double) references.size();
-        double precision = (double) match_counter/ ;
+       //double precision = (double) match_counter/ ;
         System.out.println("Coupette found " + references.size() + " Decision-references for the test dataset.");
         System.out.println("I found " + my_references.size() + " Decision-references for the test dataset.");
         System.out.println("Found " + match_counter + " matching References for the test dataset.");
         System.out.println("Accuracy: " +  accuracy);
-        System.out.println("Precision: " + precision);
+        //System.out.println("Precision: " + precision);
 
     }
 
@@ -196,15 +177,81 @@ public class Validator {
     }
 
 
+    /**
+     *
+     * @param path
+     */
+    private HashMap<String, ArrayList<String>> getGroundTruthData(String path) {
+        HashMap<String, ArrayList<String>> groundTruth = new HashMap<>();
+
+        CSVReader reader = null;
+        try {
+            reader = new CSVReader(new FileReader(path));
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                if (!line[0].equals("Dateiname")) {
+                    String ecli_of_file = line[0];
+                    ecli_of_file = ecli_of_file.replace(".pdf", "");
+                    ArrayList<String> judges = new ArrayList<>();
+                    String[] array = ArrayUtils.removeElement(line, ecli_of_file);
+                    judges.addAll(Arrays.asList(array));
+                    groundTruth.put(ecli_of_file, judges);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return groundTruth;
+    }
 
 
+    /**
+     *
+     * @param groundTruth
+     * @param decisions
+     */
+    private void compareEntities(HashMap<String, ArrayList<String>> groundTruth, ArrayList<Decision> decisions) {
+
+        int right_match_total = 0;
+        int gt_total = 0;
+        int my_total = 0;
 
 
+        for (Decision dec : decisions) {
+            String ecli = dec.getEcli();
+            ecli = ecli.split(":")[4].replace(".", "_");
 
+            ArrayList<String> my_persons = dec.getOccuringPersons();
+            ArrayList<String> gt_persons = groundTruth.get(ecli);
+            ArrayList<String> gt_persons_clear = new ArrayList<>();
+            for (String gtp : gt_persons) {
+                if (!gtp.equals("") && !gtp.contains(".pdf")) {
+                    gt_persons_clear.add(gtp);
+                }
+            }
+            gt_persons.clear();
+            gt_persons = gt_persons_clear;
 
+            System.out.println("For " + ecli + " i found " + my_persons.size() + " and gt is " + gt_persons.size());
+            gt_total = gt_total + gt_persons.size();
+            my_total = my_total + my_persons.size();
 
+            for (String my_per : my_persons) {
+                for (String gt_per : gt_persons) {
+                    if (my_per.equals(gt_per)) {
+                        right_match_total++;
+                        break;
+                    }
+                }
+            }
+        }
 
-
+        System.out.println("Found " + right_match_total + " right matches");
+        System.out.println("Found " + gt_total + " in gt");
+        System.out.println("Found " + my_total + " in mine");
+        System.out.println("finish");
+    }
 
 
 

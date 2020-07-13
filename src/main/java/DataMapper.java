@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,14 +40,29 @@ public class DataMapper {
         }
 
         //TODO uncomment for person network
-        //Decision dc = readDecisionXML("resources/Decisions/KVRE436562001.xml");
-        //Decision dc2 = readDecisionXML("resources/Decisions/KVRE437412001.xml");
-        //Decision dc3 = readDecisionXML("resources/Decisions/KVRE437342001.xml");
-        //Decision dc4 = readDecisionXML("resources/Decisions/KVRE436642001.xml");
-        //allDecisionsInDB.add(dc);
-        //allDecisionsInDB.add(dc2);
-        //allDecisionsInDB.add(dc3);
-        //allDecisionsInDB.add(dc4);
+        /*
+        Decision dc = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc2 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc3 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc4 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc5 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc6 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc7 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc8 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc9 = readDecisionXML("resources/Decisions/KVRE.xml");
+        Decision dc10 = readDecisionXML("resources/Decisions/KVRE.xml");
+
+        allDecisionsInDB.add(dc);
+        allDecisionsInDB.add(dc2);
+        allDecisionsInDB.add(dc3);
+        allDecisionsInDB.add(dc4);
+        allDecisionsInDB.add(dc5);
+        allDecisionsInDB.add(dc6);
+        allDecisionsInDB.add(dc7);
+        allDecisionsInDB.add(dc8);
+        allDecisionsInDB.add(dc9);
+        allDecisionsInDB.add(dc10);
+        */
 
 
         System.out.println("finished mapping");
@@ -155,10 +171,32 @@ public class DataMapper {
         ArrayList<String> occuringPersons = new ArrayList<>();
         ArrayList<String> occuringLocations = new ArrayList<>();
         ArrayList<String> occuringOrganisations = new ArrayList<>();
-        //PDFController pdfController = new PDFController(ecli, year, month);
+        PDFController pdfController = new PDFController(ecli, year, month);
         //ArrayList<String> occuringPersons = pdfController.getOccuringPersons();
         //ArrayList<String> occuringLocations = pdfController.getOccuringLocations();
         //ArrayList<String> occuringOrganisations = pdfController.getOccuringOrganisations();
+
+
+
+        try {
+            //File myObj = new File("resources/EntityRecognition/temp_document.txt");
+            String pr_ecli = ecli.split(":")[4];
+            pr_ecli = pr_ecli.replace(".", "_");
+
+            File db_file = new File("resources/EntityRecognition/temp_db/" + pr_ecli + ".txt");
+            Scanner myReader = new Scanner(db_file);
+            while (myReader.hasNextLine()) {
+                String str_part = myReader.nextLine();
+                occuringPersons.add(str_part.trim());
+
+            }
+            myReader.close();
+
+
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
 
 
 
@@ -175,7 +213,6 @@ public class DataMapper {
 
 
     /**
-     *
      * @param text
      * @return
      */
