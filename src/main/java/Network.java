@@ -125,7 +125,7 @@ public class Network {
         exporter.exportGraph(graph, writer);
         System.out.println(writer.toString());
 
-        Validator validator = new Validator(graph);
+        Validator validator = new Validator(graph, decs);
 
         System.out.println("test_fin");
     }
