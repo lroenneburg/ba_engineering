@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * This class fetches the data from the rechtsprechung-im-internet.de Site and calls the DataMapper to get the
+ * This class fetches the data from the rechtsprechung-im-internet.de Site and then calls the DataMapper to get the
  * Information into Java Objects
  */
 public class DataDownloader {
@@ -30,6 +30,10 @@ public class DataDownloader {
 
 
     public DataDownloader() throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InterruptedException {
+
+        /*
+            Testdataset for the first evaluation of the pipeline
+         */
         String[] things_1 = {"KVRE412581601", "KVRE410221501", "KVRE409841501", "KVRE409611501", "KVRE409201501", "KVRE409391501", "KVRE408521501", "KVRE408491501", "KVRE408451501", "KVRE408401501"};
         String[] things_2 = {"KVRE407641401", "KVRE407911501", "KVRE407651401", "KVRE407141401", "KVRE394271101", "KVRE407411401", "KVRE407131401", "KVRE407001401", "KVRE407661401", "KVRE407731401"};
         String[] things_3 = {"KVRE407821501", "KVRE394361101", "KVRE406771401", "KVRE406291401", "KVRE406371401", "KVRE406381401", "KVRE406431401", "KVRE406031401", "KVRE393401101", "KVRE393971101"};
@@ -41,13 +45,17 @@ public class DataDownloader {
         _testDataSet.addAll(Arrays.asList(things_4));
         _testDataSet.addAll(Arrays.asList(things_5));
 
+        for (String entry : _testDataSet) {
+            downloadDecisionXML(entry);
+        }
+
+
+        //TODO uncomment for fetching all new data
         //ArrayList <String> bverfg_decision_ids = readRSSFeed(_bverfgURL);
         //for (String entry : bverfg_decision_ids) {
         //    downloadDecisionXML(entry, "BVerfG");
         //}
-        for (String entry : _testDataSet) {
-            downloadDecisionXML(entry, "BVerfG");
-        }
+
 
         DataMapper dm = new DataMapper();
         //downloadDecisionXML(bverfg_decision_ids.get(4), "BVerfG");
@@ -56,7 +64,12 @@ public class DataDownloader {
     }
 
 
-
+    /**
+     * Reads the RSS Feed of the RII Site to fetch the latest decision uploads for a specific court
+     * @param url The url for the feed of a specific court
+     * @return A List of the unique IDs for all decisions in the feed
+     * @throws IOException Thrown when rssFeed is not reachable
+     */
     private ArrayList<String> readRSSFeed(String url) throws IOException {
         ArrayList<String> all_decIDs = new ArrayList<>();
 
@@ -74,25 +87,34 @@ public class DataDownloader {
             }
         }
 
-        // First URL is just the overview-url for the rss feed
+        // First URL is just the overview-url for the rss feed, so we don't need it
         all_decIDs.remove(0);
         return all_decIDs;
 
     }
 
 
-    private void downloadDecisionXML(String decisionID, String court) throws IOException {
+    /**
+     * Downloads the Decision ZIP File and extracts the Decision XML-File for the given ID and stores it on the filesystem
+     * @param decisionID The ID which XML should be downloaded
+     * @throws IOException Thrown if the website is not reachable
+     */
+    private void downloadDecisionXML(String decisionID) throws IOException {
+        // Standard url, where all decisions are stored at the webserver
         String url = "https://www.rechtsprechung-im-internet.de/jportal/docs/bsjrs/" + decisionID + ".zip";
         Files.copy(new URL(url).openStream(), Paths.get("resources/Decisions/" + decisionID + ".zip"));
 
-        String fileZip = "resources/Decisions/" + decisionID + ".zip";
-        File destDir = new File("resources/Decisions");
+        // Destination Path for the zip
+        String zipDestinationPath = "resources/Decisions/" + decisionID + ".zip";
+        File destinationDirectory = new File("resources/Decisions");
+
         byte[] buffer = new byte[1024];
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(zipDestinationPath));
         ZipEntry zipEntry = zis.getNextEntry();
+
         while (zipEntry != null) {
-            File destFile = new File(destDir, zipEntry.getName());
-            String destDirPath = destDir.getCanonicalPath();
+            File destFile = new File(destinationDirectory, zipEntry.getName());
+            String destDirPath = destinationDirectory.getCanonicalPath();
             String destFilePath = destFile.getCanonicalPath();
 
             if (!destFilePath.startsWith(destDirPath + File.separator)) {
@@ -110,7 +132,8 @@ public class DataDownloader {
         zis.closeEntry();
         zis.close();
 
-        File f = new File(fileZip);
+        // We don't need the zipfile anymore, so we delete it
+        File f = new File(zipDestinationPath);
         f.delete();
     }
 

@@ -16,17 +16,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This Class extracts the RSS-Feed model.Decision Data from the model.Decision-XML of the rechtsprechung-im-internet.de Site
+ * The DataMapper extracts the decision metadata from the downloaded decision-XML and maps it into a decision object
  */
 public class DataMapper {
 
     // Regular Expression which finds all types of docketNumbers
-    //private String _docketNumberRegex = "(((VGS|RiZ\\s?s?\\(R\\)|KZR|VRG|RiZ|EnRB|StbSt\\s?\\(B\\)|AnwZ\\s?\\(Brfg\\)|RiSt|PatAnwSt\\s?\\(R\\)|AnwZ\\s?\\(B\\)|PatAnwZ|EnVZ|AnwSt\\s?\\(B\\)|NotSt\\s?\\(Brfg\\)|KVZ|KZB|AR\\s?\\(Ri\\)|NotZ\\s?\\(Brfg\\)|RiSt\\s?\\(B\\)|AnwZ\\s?\\(P\\)|EnZB|RiSt\\s?\\(R\\)|NotSt\\s?\\(B\\)|AnwSt|WpSt\\s?\\(R\\)|KVR|AR\\s?\\(Kart\\)|EnZR|StbSt\\s?\\(R\\)|WpSt\\s?\\(B\\)|KZA|AR\\s?\\(Enw\\)|AnwSt\\s?\\(R\\)|KRB|RiZ\\s?\\(B\\)|PatAnwSt\\s?\\(B\\)|EnVR|AnwZ|NotZ|EnZA|AR)\\s\\d+/\\d+)|" +
+    //private String _referenceNumberRegex = "(((VGS|RiZ\\s?s?\\(R\\)|KZR|VRG|RiZ|EnRB|StbSt\\s?\\(B\\)|AnwZ\\s?\\(Brfg\\)|RiSt|PatAnwSt\\s?\\(R\\)|AnwZ\\s?\\(B\\)|PatAnwZ|EnVZ|AnwSt\\s?\\(B\\)|NotSt\\s?\\(Brfg\\)|KVZ|KZB|AR\\s?\\(Ri\\)|NotZ\\s?\\(Brfg\\)|RiSt\\s?\\(B\\)|AnwZ\\s?\\(P\\)|EnZB|RiSt\\s?\\(R\\)|NotSt\\s?\\(B\\)|AnwSt|WpSt\\s?\\(R\\)|KVR|AR\\s?\\(Kart\\)|EnZR|StbSt\\s?\\(R\\)|WpSt\\s?\\(B\\)|KZA|AR\\s?\\(Enw\\)|AnwSt\\s?\\(R\\)|KRB|RiZ\\s?\\(B\\)|PatAnwSt\\s?\\(B\\)|EnVR|AnwZ|NotZ|EnZA|AR)\\s\\d+/\\d+)|" +
     //        "((GSZ|LwZB|WpSt\\s?\\(B\\)|AnwZ|LwZR|KVZ|EnRB|PatAnwSt\\s?\\(B\\)|ARP|VGS|WpSt\\s?\\(R\\)|RiSt\\s?\\(B\\)|EnZA|KRB|AnwSt\\s?\\(R\\)|NotSt\\s?\\(Brfg\\)|EnVR|LwZA|ZB|AR\\s?\\(Vollz\\)|StB|ZR|AR\\s?\\(VS\\)|BJs|BLw|NotZ\\s?\\(Brfg\\)|RiZ\\s?\\(B\\)|PatAnwSt\\s?\\(R\\)|AK|RiZ|PatAnwZ|ARs|StbSt\\s?\\(R\\)|VRG|NotSt\\s?\\(B\\)|AR\\s?\\(Enw\\)|AR\\s?\\(VZ\\)|StE|KVR|AR\\s?\\(Ri\\)|AR|AnwSt|NotZ|StbSt\\s?\\(B\\)|StR|ZA|AnwZ\\s?\\(B\\)|EnZR|AR\\s?\\(Kart\\)|GSSt|AnwZ\\s?\\(P\\)|ZR\\s?\\(Ü\\)|AnwZ\\s?\\(Brfg\\)|KZB|BGns|KZR|RiSt|KZA|BAusl|AnwSt\\s?\\(B\\)|BGs|RiZ\\s?\\(R\\)|EnZB|RiSt\\s?\\(R\\)|ARZ|EnVZ)\\s\\d+/\\d+)|" +
     //        "([I+|IV|V|VI|VII|VIII|IX|X|XI|XII|1-6]+[a-z]?\\s[A-Za-z\\(\\)]{2,20}\\s\\d+/\\d\\d))| BVerfGE\\s[0-9]+,\\s[0-9]+";
 
-    private String _docketNumberRegex = "BVerfGE\\s[0-9]+,\\s[0-9]+";
+    private String _referenceNumberRegex = "BVerfGE\\s[0-9]+,\\s[0-9]+";
 
+
+    /**
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     */
     public DataMapper() throws IOException, SAXException, ParserConfigurationException, URISyntaxException, InterruptedException {
 
         ArrayList<Decision> allDecisionsInDB = new ArrayList<>();
@@ -173,8 +182,8 @@ public class DataMapper {
         ArrayList<String> occuringOrganisations = new ArrayList<>();
         PDFController pdfController = new PDFController(ecli, year, month);
         //ArrayList<String> occuringPersons = pdfController.getOccuringPersons();
-        //ArrayList<String> occuringLocations = pdfController.getOccuringLocations();
-        //ArrayList<String> occuringOrganisations = pdfController.getOccuringOrganisations();
+        //ArrayList<String> occuringLocations = pdfController.getOccurringLocations();
+        //ArrayList<String> occuringOrganisations = pdfController.getOccurringOrganisations();
 
 
 
@@ -218,7 +227,7 @@ public class DataMapper {
      */
     private ArrayList<String> findAllRegExMatches(String text) {
         ArrayList<String> allMatches = new ArrayList<>();
-        Pattern pattern = Pattern.compile(_docketNumberRegex);
+        Pattern pattern = Pattern.compile(_referenceNumberRegex);
         Matcher matcher = pattern.matcher(text);
 
         while (matcher.find()) {
