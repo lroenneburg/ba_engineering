@@ -6,12 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ba_engineering" />
-        <module name="lawstats_ba" />
+        <module name="ba_roenneburg" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ba_engineering" target="8" />
+      <module name="ba_roenneburg" target="11" />
       <module name="lawstats_ba" target="8" />
     </bytecodeTargetLevel>
   </component>
