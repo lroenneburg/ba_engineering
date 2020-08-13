@@ -7,10 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 @SpringBootApplication
-public class BaRoenneburgApplication {
+public class BaRoenneburgApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws IOException {
         SpringApplication.run(BaRoenneburgApplication.class, args);
