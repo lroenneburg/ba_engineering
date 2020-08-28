@@ -100,9 +100,9 @@ public class DecisionController {
             path = "/getDecision",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Iterable<Decision> getDecisionFromESDatabase(@RequestParam String decisionid) {
+    public String getDecisionFromESDatabase(@RequestParam String decisionid) {
         Optional<Decision> byId = decisionRepository.findById(decisionid);
         System.out.println("okay");
-        return null;
+        return "okay";
     }
 }
