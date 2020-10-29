@@ -1,6 +1,7 @@
 package ba_roenneburg.elasticsearch;
 
 import ba_roenneburg.DataMapper;
+import ba_roenneburg.Network;
 import ba_roenneburg.elasticsearch.repository.DecisionRepository;
 import ba_roenneburg.model.Decision;
 import ba_roenneburg.model.DecisionSection;
@@ -11,13 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
@@ -27,13 +24,13 @@ public class DecisionController {
     ElasticsearchOperations operations;
 
     @Autowired
-    DecisionRepository decisionRepository;
+    DecisionRepository _decisionRepository;
 
 
     @RequestMapping("/all")
     public ArrayList<Decision> getAllDecisions() {
         ArrayList<Decision> decisions = new ArrayList<>();
-        decisionRepository.findAll().forEach(decisions::add);
+        _decisionRepository.findAll().forEach(decisions::add);
         return decisions;
     }
 
@@ -42,6 +39,10 @@ public class DecisionController {
 
         //new ElasticConfig().elasticsearchTemplate().indexOps(Decision.class).create();
 
+        ArrayList<DecisionSection> dissentingOpinions = new ArrayList<>();
+        ArrayList<String> sonstosatz = new ArrayList<>();
+        ArrayList<String> dn = new ArrayList<>();
+        dn.add("2 BvR 2299/09");
         ArrayList<String> norms = new ArrayList<>();
         norms.add("Art 103 Abs 1 GG, Art 1 Abs 1 GG, Art 25 GG");
         norms.add("Art 2 Abs 1 GG, § 93c Abs 1 S 1 BVerfGG");
@@ -73,25 +74,40 @@ public class DecisionController {
         ArrayList<DecisionSection> fact = new ArrayList<>();
 
         Decision decision1 = new Decision("KVRE387011001", "ECLI:DE:BVerfG:2010:rk20100116.2bvr229909", "BVerfG", "2. Senat 2. Kammer", "16.01.2010",
-                "2 BvR 2299/09", "Stattgebender Kammerbeschluss", norms, lowerCourts, "Teilweise stattgebender Kammerbeschluss: Auslieferung verletzt Grundrechte des Betroffenen aus Art 2 Abs 1 GG iVm Art 1 Abs 1 GG, wenn die Vollstreckung einer erschwerten lebenslangen Freiheitsstrafe droht - hier: Auslieferung in die Türkei zum Zweck der Strafverfolgung wegen Staatsschutzdelikten - Möglichkeit der Begnadigung nach türkischem Recht aufgrund tatbestandlicher Einschränkungen im Hinblick auf Verhältnismäßigkeitsgrundsatz des GG unzureichend", gui_princ,
-                "", tenor, fact, decReasons, "", "http://www.rechtsprechung-im-internet.de/jportal/?quelle=jlink&docid=KVRE387011001&psml=bsjrsprod.psml&max=true", occCit,
-                occJudge, new ArrayList<>(), new ArrayList<>());
-        decisionRepository.save(decision1);
-        return decision1;
+                dn, "Stattgebender Kammerbeschluss", norms, lowerCourts, "Teilweise stattgebender Kammerbeschluss: Auslieferung verletzt Grundrechte des Betroffenen aus Art 2 Abs 1 GG iVm Art 1 Abs 1 GG, wenn die Vollstreckung einer erschwerten lebenslangen Freiheitsstrafe droht - hier: Auslieferung in die Türkei zum Zweck der Strafverfolgung wegen Staatsschutzdelikten - Möglichkeit der Begnadigung nach türkischem Recht aufgrund tatbestandlicher Einschränkungen im Hinblick auf Verhältnismäßigkeitsgrundsatz des GG unzureichend", gui_princ,
+                sonstosatz, tenor, fact, decReasons, dissentingOpinions, "http://www.rechtsprechung-im-internet.de/jportal/?quelle=jlink&docid=KVRE387011001&psml=bsjrsprod.psml&max=true", occCit,
+                occJudge);
+        //_decisionRepository.save(decision1);
+        return null;
     }
 
 
-    @RequestMapping(value = "/addDB")
-    public String addDB() throws URISyntaxException, SAXException, ParserConfigurationException, InterruptedException, IOException {
-        DataMapper dm = new DataMapper();
-        ArrayList<Decision> allDecisionsInDB = dm.getAllDecisionsInDB();
+    @RequestMapping(value = "/addAllDecisionsToDB")
+    public String addDB() throws IOException {
+
+        System.out.println("Crawl all Decisions...");
+        ArrayList<String> decisionIDs = new ArrayList<>();
+        File decision_folder = new File("src/main/resources/Decisions");
+        File[] files = decision_folder.listFiles();
+        for (int i = 10000; i <= 35000; i++) {
+            decisionIDs.add(files[i].getName().split("\\.")[0]);
+        }
+
+        System.out.println("Start Mapping...");
+        DataMapper dataMapper = new DataMapper();
+        ArrayList<Decision> decisions = dataMapper.mapDecisionObjects(decisionIDs);
+        System.out.println("Decisions Mapped successfully");
+
+
         int counter = 0;
 
-        for (Decision d : allDecisionsInDB) {
-            decisionRepository.save(d);
+        System.out.println("Start uploading to ElasticSearch...");
+        for (Decision d : decisions) {
+            _decisionRepository.save(d);
             counter++;
         }
-        return counter + " Decisions added successfully.";
+        System.out.println("Finished Uploading.");
+        return counter + " Decisions added successfully to Database.";
     }
 
 
@@ -100,9 +116,63 @@ public class DecisionController {
             path = "/getDecision",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public String getDecisionFromESDatabase(@RequestParam String decisionid) {
-        Optional<Decision> byId = decisionRepository.findById(decisionid);
-        System.out.println("okay");
-        return "okay";
+    public Optional<Decision> getDecisionFromESDatabase(@RequestParam String decisionid) {
+        return _decisionRepository.findById(decisionid);
     }
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/getDBSize",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public long getSizeOfESDatabase() {
+        return _decisionRepository.count();
+    }
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/getDecisionByECLI",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public Optional<Decision> getDecisionByECLIFromESDatabase(@RequestParam String ecli) {
+        return _decisionRepository.findByEcli(ecli);
+    }
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/getAll",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public Iterable<Decision> getAllDecision() {
+        Iterable<Decision> all = _decisionRepository.findAll();
+        System.out.println("lel");
+        return null;
+    }
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/deleteAll",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public String deleteTheDB() {
+        _decisionRepository.deleteAll();
+        return "All deleted";
+    }
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/testNetwork",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public String testNetwork() {
+        ArrayList<Decision> decs = _decisionRepository.findByCourtType("BVerfG");
+        Network network = new Network(decs);
+        return "Done.";
+    }
+
+
 }

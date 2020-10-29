@@ -1,5 +1,12 @@
 package ba_roenneburg.elasticsearch;
 
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,10 +24,19 @@ public class ElasticConfig {
 
     @Bean
     public RestHighLevelClient client() {
-        ClientConfiguration clientConfiguration
-                = ClientConfiguration.builder()
-                .connectedTo("localhost:9200")
-                .build();
+
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("noduser", "ltnod2019"));
+
+        //TestServer
+        ClientConfiguration clientConfiguration = ClientConfiguration.builder().connectedTo("localhost:9200").build();
+
+        //RestClientBuilder builder = RestClient.builder(new HttpHost("http://localhost:9200"));
+
+        //RestClientBuilder builder = RestClient.builder(new HttpHost("https://ltdemos.informatik.uni-hamburg.de/depcc-index/", 443))
+        //       .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+
+        //return new RestHighLevelClient(builder);
 
         return RestClients.create(clientConfiguration).rest();
     }
